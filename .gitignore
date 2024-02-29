@@ -1,2 +1,4 @@
 newvn
 .idea
+**/__pycache__
+*.pyc
