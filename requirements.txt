@@ -1,7 +1,10 @@
 asgiref==3.7.2
+Babel==2.14.0
 Django==4.2.10
+django-money==3.4.1
 djangorestframework==3.14.0
+py-moneyed==3.0
 pytz==2024.1
 sqlparse==0.4.4
-typing_extensions==4.10.0
+typing-extensions==4.10.0
 tzdata==2024.1
