@@ -1,21 +1,34 @@
+from random import randint
 from uuid import uuid4
+from django.utils import timezone
 from django.db import models
 from django.core.validators import RegexValidator
 from djmoney.models.fields import MoneyField
+
+
+MIN_LISTENERS = 10
+MAX_LISTENERS = 50
 
 
 def get_uuid():
     return str(uuid4())
 
 
+def get_random_start_date():
+    return timezone.now() + timezone.timedelta(days=randint(1, 32))
+
+
 class Course(models.Model):
     courseid = models.AutoField(primary_key=True)
     author = models.ForeignKey("Author", on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=70, unique=True)
-    startat = models.DateTimeField(auto_now=True)
+    startat = models.DateTimeField(default=get_random_start_date)
     price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD')
-    minlisteners = models.PositiveSmallIntegerField(default=10)
-    maxlisteners = models.PositiveSmallIntegerField(default=50)
+    minlisteners = models.PositiveSmallIntegerField(default=MIN_LISTENERS)
+    maxlisteners = models.PositiveSmallIntegerField(default=MAX_LISTENERS)
+
+    def __str__(self):
+        return f"{self.name} ({str(self.author)})"
 
 
 class Contract(models.Model):
@@ -31,10 +44,13 @@ class Author(models.Model):
     firstname = models.CharField(max_length=50)
     lastname = models.CharField(max_length=50)
 
+    def __str__(self):
+        return f"{self.firstname} {self.lastname}"
+
 
 class Lesson(models.Model):
     lessonid = models.UUIDField(default=get_uuid, primary_key=True)
-    product = models.OneToOneField("Course", on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=100)
     videourl = models.URLField()
 
