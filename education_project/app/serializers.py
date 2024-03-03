@@ -16,6 +16,6 @@ class OutputMultiModelSerializer(serializers.Serializer):
     course__minlisteners = serializers.IntegerField()
 
 
-class StudyingPlanSerializer(serializers):
+class StudyingPlanSerializer(serializers.Serializer):
     course__name = serializers.CharField()
     lesson__name = serializers.CharField()
