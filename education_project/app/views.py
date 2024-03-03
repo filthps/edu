@@ -37,8 +37,7 @@ class Logic:
             .values("course_id", "course__name", "course__maxlisteners", "course__minlisteners", "course__startat")\
             .exclude(course__startat__lte=timezone.now())\
             .annotate(current_listeners_count=Count("id", distinct=True))\
-            .exclude(course__minlisteners__lt=(Value("current_listeners_count") + 1))\
-            .filter(course__maxlisteners__gt=Value("current_listeners_count")).order_by("-current_listeners_count")
+            .exclude(course__maxlisteners__lte=(Value("current_listeners_count") + 1)).order_by("-current_listeners_count")
         if return_group:
             if queryset.count():
                 return Group.objects.get(groupid=queryset[0].group_id)
@@ -63,7 +62,8 @@ class AvailableCourses(ListAPIView):
             .values("course_id", "course__name", "course__maxlisteners", "course__startat", "course__minlisteners")\
             .exclude(course__startat__lte=timezone.now())\
             .annotate(current_listeners_count=Count("id", distinct=True))\
-            .exclude(course__maxlisteners__gte=Value("current_listeners_count"))\
+            .exclude(course__maxlisteners__lt=Value("current_listeners_count"))\
+            .exclude(course__minlisteners__gte=Value("current_listeners_count"))\
             .annotate(lessons_count=Count("", filter=Subquery(Lesson.objects.filter(product_id=Value("course_id"))), distinct=True)  # todo: fixit
                       )
         return queryset
