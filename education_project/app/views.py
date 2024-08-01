@@ -1,7 +1,7 @@
 from typing import Optional, Union
 from rest_framework import status
 from django.db.transaction import atomic
-from django.db.models import Count, Value, Subquery
+from django.db.models import Count, Value, Subquery, F
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -63,7 +63,7 @@ class AvailableCourses(ListAPIView):
             .exclude(course__startat__lte=timezone.now())\
             .annotate(current_listeners_count=Count("id", distinct=True))\
             .exclude(course__maxlisteners__lte=Value("current_listeners_count"))\
-            .annotate(lessons_count=Count("", filter=Subquery(Lesson.objects.filter(product_id=Value("course_id"))), distinct=True)  # todo: fixit
+            .annotate(lessons_count=Count("", filter=Subquery(Lesson.objects.filter(product_id=F("course_id"))), distinct=True)  # todo: fixit
                       ).order_by("-current_listeners_count")
         return queryset
 
